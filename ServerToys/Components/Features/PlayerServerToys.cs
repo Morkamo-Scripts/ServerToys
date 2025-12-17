@@ -1,10 +1,8 @@
 ﻿using Exiled.API.Features;
-using LabApi.Events;
-using ServerToys.Features.Components;
-using ServerToys.ReworkedCoin;
+using ServerToys.Components.Features.Components;
 using UnityEngine;
 
-namespace ServerToys.Features;
+namespace ServerToys.Components.Features;
 
 public sealed class PlayerServerToys() : MonoBehaviour
 {

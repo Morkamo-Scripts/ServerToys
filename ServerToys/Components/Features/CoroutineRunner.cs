@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-namespace ServerToys.Features;
+namespace ServerToys.Components.Features;
 
 public class CoroutineRunner : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class CoroutineRunner : MonoBehaviour
         {
             if (_instance == null)
             {
-                var go = new GameObject("[DarkAPI] CoroutineRunner");
+                var go = new GameObject("[ServerToys] CoroutineRunner");
                 _instance = go.AddComponent<CoroutineRunner>();
                 DontDestroyOnLoad(go);
             }

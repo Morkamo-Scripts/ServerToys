@@ -1,4 +1,4 @@
-﻿namespace ServerToys.Features.Components.Interfaces;
+﻿namespace ServerToys.Components.Features.Components.Interfaces;
 
 public interface IPlayerPropertyModule
 {

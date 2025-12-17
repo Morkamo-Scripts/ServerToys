@@ -1,10 +1,4 @@
-﻿using System.Reflection;
-using Exiled.API.Features;
-using Exiled.CustomItems.API.Features;
-using HarmonyLib;
-using InventorySystem.Items.Jailbird;
-
-namespace ServerToys.Patches
+﻿namespace ServerToys.Components.Patches
 {
     /*[HarmonyPatch(typeof(JailbirdDeteriorationTracker), "RecheckUsage")]
     public class JailbirdWearStatePatchь

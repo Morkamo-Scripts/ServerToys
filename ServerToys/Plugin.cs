@@ -2,10 +2,12 @@
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using HarmonyLib;
+using PlayerRoles;
 using ServerToys.AutoCleaner;
-using ServerToys.Features;
+using ServerToys.Components.Features;
 using ServerToys.Lightflicker;
 using ServerToys.ReworkedCoin;
+using ServerToys.RoundController;
 using events = Exiled.Events.Handlers;
 
 namespace ServerToys
@@ -16,13 +18,14 @@ namespace ServerToys
         public override string Prefix => Name;
         public override string Author => "Morkamo";
         public override Version RequiredExiledVersion => new(9, 1, 0);
-        public override Version Version => new(1, 0, 0);
+        public override Version Version => new(1, 1, 0);
 
         public static Plugin Instance;
         public static Harmony Harmony;
         public CoinHandler CoinHandler;
         public LightflickerHandler LightflickerHandler;
         public AutoCleanerHandler AutoCleanerHandler;
+        public RoundHandler RoundHandler;
 
         public override void OnEnabled()
         {
@@ -34,6 +37,7 @@ namespace ServerToys
             CoinHandler = Config.Handler;
             LightflickerHandler = new LightflickerHandler();
             AutoCleanerHandler = new AutoCleanerHandler();
+            RoundHandler =  new RoundHandler();
             
             RegisterEvents();
             base.OnEnabled();
@@ -42,7 +46,8 @@ namespace ServerToys
         public override void OnDisabled()
         {
             UnregisterEvents();
-            
+
+            RoundHandler = null;
             AutoCleanerHandler = null;
             LightflickerHandler = null;
             CoinHandler = null;
@@ -60,7 +65,8 @@ namespace ServerToys
             events.Server.RoundStarted += LightflickerHandler.OnRoundStarted;
             events.Map.Decontaminating += AutoCleanerHandler.OnDecontaminatedLcz;
             events.Warhead.Detonated += AutoCleanerHandler.OnWarheadDetonated;
-            LabApi.Events.Handlers.PlayerEvents.ChangedRole += CoinHandler.OnChangedRole;
+            events.Player.ChangingRole += CoinHandler.OnChangingRole;
+            events.Player.ReceivingEffect += RoundHandler.OnReceivingEffect;
             LabApi.Events.Handlers.ServerEvents.CassieAnnouncing += LightflickerHandler.OnCassieAnnouncing;
             LabApi.Events.Handlers.ServerEvents.RoundEnded += LightflickerHandler.OnRoundEnded;
         }
@@ -73,7 +79,8 @@ namespace ServerToys
             events.Server.RoundStarted -= LightflickerHandler.OnRoundStarted;
             events.Map.Decontaminating -= AutoCleanerHandler.OnDecontaminatedLcz;
             events.Warhead.Detonated -= AutoCleanerHandler.OnWarheadDetonated;
-            LabApi.Events.Handlers.PlayerEvents.ChangedRole -= CoinHandler.OnChangedRole;
+            events.Player.ChangingRole -= CoinHandler.OnChangingRole;
+            events.Player.ReceivingEffect -= RoundHandler.OnReceivingEffect;
             LabApi.Events.Handlers.ServerEvents.CassieAnnouncing -= LightflickerHandler.OnCassieAnnouncing;
             LabApi.Events.Handlers.ServerEvents.RoundEnded -= LightflickerHandler.OnRoundEnded;
         }

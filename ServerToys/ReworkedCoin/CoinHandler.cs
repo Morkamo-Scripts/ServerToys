@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -15,8 +16,8 @@ using PlayerRoles;
 using RueI.API;
 using RueI.API.Elements;
 using ServerToys.Components;
-using ServerToys.Extensions;
-using ServerToys.Features;
+using ServerToys.Components.Extensions;
+using ServerToys.Components.Features;
 using ServerToys.ReworkedCoin.Enums;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -216,14 +217,14 @@ namespace ServerToys.ReworkedCoin
         {
             byte eventNumber = (byte)Random.Range(0, 3);
 
-            switch (0)
+            switch (eventNumber)
             {
                 case 0: // Негативные события
                 {
                     var values = (NegativeEvents[])Enum.GetValues(typeof(NegativeEvents));
                     NegativeEvents ev = values[Random.Range(0, values.Length)];
                     
-                    switch (NegativeEvents.ForceClassScp0492)
+                    switch (ev)
                     {
                         case NegativeEvents.Handcuff:
                         {
@@ -252,14 +253,14 @@ namespace ServerToys.ReworkedCoin
                             FlashGrenade flash = (FlashGrenade)Item.Create(ItemType.GrenadeFlash, player);
                             flash.FuseTime = 0f;
                             flash.SpawnActive(player.Position);
-                            return "Вспышка!";
+                            return "<size=50>Вспышка!</size>";
                         }
                         case NegativeEvents.ExplodeFragGrenade:
                         {
-                            FlashGrenade flash = (FlashGrenade)Item.Create(ItemType.GrenadeFlash, player);
-                            flash.FuseTime = 1f;
-                            flash.SpawnActive(player.Position);
-                            return "Вам выпал колобок! Бум?";
+                            ExplosiveGrenade he = (ExplosiveGrenade)Item.Create(ItemType.GrenadeHE, player);
+                            he.FuseTime = 1f;
+                            he.SpawnActive(player.Position, player);
+                            return "<size=50>Вам выпал колобок!</size>\n\n<size=60>Бум?</size>";
                         }
                         case NegativeEvents.RandomDamage:
                         {
@@ -308,17 +309,28 @@ namespace ServerToys.ReworkedCoin
                             
                             player.Role.Set(RoleTypeId.Scp0492);
                             player.Teleport(oldPosition);
-                            player.MaxHealth = 1000;
-                            player.Health = 1000;
+                            player.MaxHealth = 800;
+                            player.Health = 800;
                             
                             if (scp049 != null)
                                 RueHint(scp049, $"В вашей армии пополнение!\n{player.Nickname}");
 
                             var props = player.PlayerServerToys().CoinProps;
+                            props.IsCoinZombie = true;
                             
                             Object.Destroy(props.ZombieHightlighterParent);
                             
-                            props.ActiveCustomEffects.Add(nameof(ZombieCoinHeal), CoroutineRunner.Run(ZombieCoinHeal(player)));
+                            props.ZombieHightlighterParent = new GameObject(nameof(props.ZombieHightlighterParent));
+                            props.ZombieHightlighterParent.transform.position = player.Position;
+                            props.ZombieHightlighterParent.transform.SetParent(player.Transform);
+                            
+                            HighlightManager.ProceduralParticles(props.ZombieHightlighterParent, Color.red, 0, 0.05f,
+                                new(0.5f, 0.5f, 0.5f), 0.1f, 5);
+                            
+                            props.ActiveCustomEffects.Add(nameof(ZombieCoinHeal), 
+                                CoroutineRunner.Run(ZombieCoinHeal(player)));
+                            props.ActiveCustomEffects.Add(nameof(ZombieHumeShieldRegen), 
+                                CoroutineRunner.Run(ZombieHumeShieldRegen(player)));
                             
                             return $"Ты живой?";
                         }
@@ -630,32 +642,48 @@ namespace ServerToys.ReworkedCoin
             }
         }
 
-        private IEnumerator<float> ZombieCoinHeal(Player player)
+        private IEnumerator ZombieCoinHeal(Player player)
         {
-            while (player.PlayerServerToys().CoinProps.IsZombieCoinHealing)
+            while (player.PlayerServerToys().CoinProps.IsCoinZombie && player.IsAlive)
             {
                 player.Heal(1f);
-                yield return Timing.WaitForSeconds(1f);
+                yield return new WaitForSeconds(1f);
             }
         }
-
-        public void OnDied(DiedEventArgs ev)
+        
+        private IEnumerator ZombieHumeShieldRegen(Player player)
         {
-            var props = ev.Player.PlayerServerToys().CoinProps;
-            if (props.IsZombieCoinHealing)
+            for (int i = 0; i < 100 && player.IsAlive && player.PlayerServerToys().CoinProps.IsCoinZombie; i++)
             {
-                props.IsZombieCoinHealing = false;
-                if (props.ActiveCustomEffects.TryGetValue(nameof(ZombieCoinHeal), out var coroutine))
-                {
-                    CoroutineRunner.Stop(coroutine);
-                }
+                player.HumeShield++;
+                yield return new WaitForSeconds(0.1f);
             }
         }
 
-        public void OnChangedRole(PlayerChangedRoleEventArgs ev)
+        public void OnDied(DiedEventArgs ev) => DestroyZombieHandler(ev.Player);
+        public void OnChangingRole(ChangingRoleEventArgs ev) => DestroyZombieHandler(ev.Player);
+        
+        private void DestroyZombieHandler(Player player)
         {
-            if (ev.OldRole == RoleTypeId.Scp0492)
-                Object.Destroy(ev.Player.PlayerServerToys().CoinProps.ZombieHightlighterParent);
+            var props = player.PlayerServerToys();
+            
+            if (props.CoinProps.IsCoinZombie)
+            {
+                props.CoinProps.IsCoinZombie = false;
+                
+                Object.Destroy(props.CoinProps.ZombieHightlighterParent);
+                
+                props.CoinProps.ActiveCustomEffects.TryGetValue(nameof(ZombieCoinHeal),
+                    out var coroutine);
+                props.CoinProps.ActiveCustomEffects.TryGetValue(nameof(ZombieHumeShieldRegen),
+                    out var coroutine2);
+                
+                if (coroutine != null) CoroutineRunner.Stop(coroutine);
+                if (coroutine2 != null) CoroutineRunner.Stop(coroutine2);
+
+                props.CoinProps.ActiveCustomEffects.Remove(nameof(ZombieCoinHeal));
+                props.CoinProps.ActiveCustomEffects.Remove(nameof(ZombieHumeShieldRegen));
+            }
         }
     }
 }
