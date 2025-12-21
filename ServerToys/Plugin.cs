@@ -3,7 +3,6 @@ using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using HarmonyLib;
 using PlayerRoles;
-using ServerToys.AutoCleaner;
 using ServerToys.Components.Features;
 using ServerToys.Lightflicker;
 using ServerToys.ReworkedCoin;
@@ -18,25 +17,25 @@ namespace ServerToys
         public override string Prefix => Name;
         public override string Author => "Morkamo";
         public override Version RequiredExiledVersion => new(9, 1, 0);
-        public override Version Version => new(1, 1, 0);
+        public override Version Version => new(2, 0, 0);
 
         public static Plugin Instance;
         public static Harmony Harmony;
         public CoinHandler CoinHandler;
         public LightflickerHandler LightflickerHandler;
-        public AutoCleanerHandler AutoCleanerHandler;
+        /*public AutoCleanerHandler AutoCleanerHandler;*/
         public RoundHandler RoundHandler;
 
         public override void OnEnabled()
         {
             Instance = this;
             
-            Harmony = new Harmony("ru.morkamo.patches");
+            Harmony = new Harmony("ru.morkamo.serverToys.patches");
             Harmony.PatchAll();
             
             CoinHandler = Config.Handler;
             LightflickerHandler = new LightflickerHandler();
-            AutoCleanerHandler = new AutoCleanerHandler();
+            /*AutoCleanerHandler = new AutoCleanerHandler();*/
             RoundHandler =  new RoundHandler();
             
             RegisterEvents();
@@ -48,7 +47,7 @@ namespace ServerToys
             UnregisterEvents();
 
             RoundHandler = null;
-            AutoCleanerHandler = null;
+            /*AutoCleanerHandler = null;*/
             LightflickerHandler = null;
             CoinHandler = null;
             
@@ -60,11 +59,10 @@ namespace ServerToys
         private void RegisterEvents()
         {
             events.Player.Verified += OnVerifiedPlayer;
-            events.Player.Died += CoinHandler.OnDied;
             events.Player.FlippingCoin += CoinHandler.OnCoinFlipped;
             events.Server.RoundStarted += LightflickerHandler.OnRoundStarted;
-            events.Map.Decontaminating += AutoCleanerHandler.OnDecontaminatedLcz;
-            events.Warhead.Detonated += AutoCleanerHandler.OnWarheadDetonated;
+            /*events.Map.Decontaminating += AutoCleanerHandler.OnDecontaminatedLcz;
+            events.Warhead.Detonated += AutoCleanerHandler.OnWarheadDetonated;*/
             events.Player.ChangingRole += CoinHandler.OnChangingRole;
             events.Player.ReceivingEffect += RoundHandler.OnReceivingEffect;
             LabApi.Events.Handlers.ServerEvents.CassieAnnouncing += LightflickerHandler.OnCassieAnnouncing;
@@ -74,11 +72,10 @@ namespace ServerToys
         private void UnregisterEvents()
         {
             events.Player.Verified -= OnVerifiedPlayer;
-            events.Player.Died -= CoinHandler.OnDied;
             events.Player.FlippingCoin -= CoinHandler.OnCoinFlipped;
             events.Server.RoundStarted -= LightflickerHandler.OnRoundStarted;
-            events.Map.Decontaminating -= AutoCleanerHandler.OnDecontaminatedLcz;
-            events.Warhead.Detonated -= AutoCleanerHandler.OnWarheadDetonated;
+            /*events.Map.Decontaminating -= AutoCleanerHandler.OnDecontaminatedLcz;
+            events.Warhead.Detonated -= AutoCleanerHandler.OnWarheadDetonated;*/
             events.Player.ChangingRole -= CoinHandler.OnChangingRole;
             events.Player.ReceivingEffect -= RoundHandler.OnReceivingEffect;
             LabApi.Events.Handlers.ServerEvents.CassieAnnouncing -= LightflickerHandler.OnCassieAnnouncing;

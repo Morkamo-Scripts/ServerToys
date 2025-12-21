@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿/*using System.Linq;
 using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Pickups;
@@ -44,4 +44,4 @@ public class AutoCleanerHandler
                 .ToList()
         );
     }
-}
+}*/

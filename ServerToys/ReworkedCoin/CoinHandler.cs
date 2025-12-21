@@ -317,11 +317,13 @@ namespace ServerToys.ReworkedCoin
 
                             var props = player.PlayerServerToys().CoinProps;
                             props.IsCoinZombie = true;
-                            
-                            Object.Destroy(props.ZombieHightlighterParent);
-                            
-                            props.ZombieHightlighterParent = new GameObject(nameof(props.ZombieHightlighterParent));
-                            props.ZombieHightlighterParent.transform.position = player.Position;
+                            props.ZombieHightlighterParent = new GameObject(nameof(props.ZombieHightlighterParent))
+                            {
+                                transform =
+                                {
+                                    position = player.Position
+                                }
+                            };
                             props.ZombieHightlighterParent.transform.SetParent(player.Transform);
                             
                             HighlightManager.ProceduralParticles(props.ZombieHightlighterParent, Color.red, 0, 0.05f,
@@ -644,7 +646,7 @@ namespace ServerToys.ReworkedCoin
 
         private IEnumerator ZombieCoinHeal(Player player)
         {
-            while (player.PlayerServerToys().CoinProps.IsCoinZombie && player.IsAlive)
+            while (player.IsAlive && player.PlayerServerToys().CoinProps.IsCoinZombie)
             {
                 player.Heal(1f);
                 yield return new WaitForSeconds(1f);
@@ -659,15 +661,14 @@ namespace ServerToys.ReworkedCoin
                 yield return new WaitForSeconds(0.1f);
             }
         }
-
-        public void OnDied(DiedEventArgs ev) => DestroyZombieHandler(ev.Player);
-        public void OnChangingRole(ChangingRoleEventArgs ev) => DestroyZombieHandler(ev.Player);
         
-        private void DestroyZombieHandler(Player player)
+        public void OnChangingRole(ChangingRoleEventArgs ev) => DestroyZombieHandler(ev.Player, ref ev);
+        
+        private void DestroyZombieHandler(Player player, ref ChangingRoleEventArgs ev)
         {
             var props = player.PlayerServerToys();
             
-            if (props.CoinProps.IsCoinZombie)
+            if (props != null && ev.Player.Role == RoleTypeId.Scp0492 && props.CoinProps.IsCoinZombie)
             {
                 props.CoinProps.IsCoinZombie = false;
                 
