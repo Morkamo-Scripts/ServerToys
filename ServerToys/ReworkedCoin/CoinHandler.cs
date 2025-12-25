@@ -28,6 +28,8 @@ namespace ServerToys.ReworkedCoin
 {
     public class CoinHandler
     {
+        public bool IsEnabled { get; set; } = true;
+        
         private const int HintWidth = 300;
         private const float HintDuration = 4f;
         
@@ -199,6 +201,9 @@ namespace ServerToys.ReworkedCoin
         
         public void OnCoinFlipped(FlippingCoinEventArgs ev)
         {
+            if (!IsEnabled)
+                return;
+            
             Timing.CallDelayed(1.1f, () =>
             {
                 if (ev.Player.CurrentItem.Type == ItemType.Coin)

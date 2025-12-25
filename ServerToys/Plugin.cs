@@ -17,7 +17,7 @@ namespace ServerToys
         public override string Prefix => Name;
         public override string Author => "Morkamo";
         public override Version RequiredExiledVersion => new(9, 1, 0);
-        public override Version Version => new(2, 0, 0);
+        public override Version Version => new(2, 1, 0);
 
         public static Plugin Instance;
         public static Harmony Harmony;
@@ -65,6 +65,7 @@ namespace ServerToys
             events.Warhead.Detonated += AutoCleanerHandler.OnWarheadDetonated;*/
             events.Player.ChangingRole += CoinHandler.OnChangingRole;
             events.Player.ReceivingEffect += RoundHandler.OnReceivingEffect;
+            events.Player.Spawned += RoundHandler.OnSpawned;
             LabApi.Events.Handlers.ServerEvents.CassieAnnouncing += LightflickerHandler.OnCassieAnnouncing;
             LabApi.Events.Handlers.ServerEvents.RoundEnded += LightflickerHandler.OnRoundEnded;
         }
@@ -78,6 +79,7 @@ namespace ServerToys
             events.Warhead.Detonated -= AutoCleanerHandler.OnWarheadDetonated;*/
             events.Player.ChangingRole -= CoinHandler.OnChangingRole;
             events.Player.ReceivingEffect -= RoundHandler.OnReceivingEffect;
+            events.Player.Spawned -= RoundHandler.OnSpawned;
             LabApi.Events.Handlers.ServerEvents.CassieAnnouncing -= LightflickerHandler.OnCassieAnnouncing;
             LabApi.Events.Handlers.ServerEvents.RoundEnded -= LightflickerHandler.OnRoundEnded;
         }
