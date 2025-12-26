@@ -10,8 +10,10 @@ public sealed class PlayerServerToys() : MonoBehaviour
     {
         Player = Player.Get(gameObject);
         CoinProps = new CoinProps(this);
+        PlayerProps = new PlayerProps(this);
     }
 
     public Player Player { get; private set; }
     public CoinProps CoinProps { get; private set; }
+    public PlayerProps PlayerProps { get; private set; }
 }

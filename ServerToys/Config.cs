@@ -9,5 +9,6 @@ namespace ServerToys
         public bool Debug { get; set; } = false;
         
         public CoinHandler Handler { get; set; } = new CoinHandler();
+        public bool IsLightflickerEnabled { get; set; } = true;
     }
 }

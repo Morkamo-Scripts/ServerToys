@@ -19,7 +19,11 @@ public class LightflickerHandler
 {
     private bool _isCassieDeactivated = false;
 
-    public void OnRoundStarted() => Timing.RunCoroutine(FlickerHandler(), "CassieLightFlicker");
+    public void OnRoundStarted()
+    {
+        if (Plugin.Instance.Config.IsLightflickerEnabled)
+            Timing.RunCoroutine(FlickerHandler(), "CassieLightFlicker");
+    }
 
     public void OnRoundEnded(RoundEndedEventArgs ev)
     {

@@ -167,9 +167,14 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="AutoCleaner\AutoCleanerHandler.cs" />
+        <Compile Include="Components\Events\Components\ICancelableEvent.cs" />
+        <Compile Include="Components\Events\EventArgs\Player\PlayerFullConnectedEventArgs.cs" />
+        <Compile Include="Components\Events\EventManager.cs" />
+        <Compile Include="Components\Events\PlayerEvents.cs" />
         <Compile Include="Components\Extensions\PlayerExtensions.cs" />
         <Compile Include="Components\Features\Components\CoinProps.cs" />
         <Compile Include="Components\Features\Components\Interfaces\IPlayerPropertyModule.cs" />
+        <Compile Include="Components\Features\Components\PlayerProps.cs" />
         <Compile Include="Components\Features\CoroutineRunner.cs" />
         <Compile Include="Components\Features\PlayerServerToys.cs" />
         <Compile Include="Components\HighlightManager.cs" />

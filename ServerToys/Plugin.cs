@@ -1,8 +1,15 @@
 ﻿using System;
+using Exiled.API.Enums;
+using Exiled.API.Extensions;
 using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using HarmonyLib;
+using InventorySystem.Items.Coin;
+using MEC;
+using Mirror;
 using PlayerRoles;
+using ServerToys.Components.Events;
+using ServerToys.Components.Extensions;
 using ServerToys.Components.Features;
 using ServerToys.Lightflicker;
 using ServerToys.ReworkedCoin;
@@ -47,7 +54,6 @@ namespace ServerToys
             UnregisterEvents();
 
             RoundHandler = null;
-            /*AutoCleanerHandler = null;*/
             LightflickerHandler = null;
             CoinHandler = null;
             
@@ -61,13 +67,16 @@ namespace ServerToys
             events.Player.Verified += OnVerifiedPlayer;
             events.Player.FlippingCoin += CoinHandler.OnCoinFlipped;
             events.Server.RoundStarted += LightflickerHandler.OnRoundStarted;
-            /*events.Map.Decontaminating += AutoCleanerHandler.OnDecontaminatedLcz;
-            events.Warhead.Detonated += AutoCleanerHandler.OnWarheadDetonated;*/
             events.Player.ChangingRole += CoinHandler.OnChangingRole;
+            LabApi.Events.Handlers.PlayerEvents.Spawned += RoundHandler.OnSpawned;
+            events.Player.RemovedHandcuffs += CoinHandler.OnRemovedHandcuffs;
+            events.Player.Hurting += RoundHandler.OnHurting;
+            events.Server.RoundEnded += RoundHandler.OnRoundEnded;
+            events.Server.WaitingForPlayers += RoundHandler.OnWaitForPlayers;
             events.Player.ReceivingEffect += RoundHandler.OnReceivingEffect;
-            events.Player.Spawned += RoundHandler.OnSpawned;
             LabApi.Events.Handlers.ServerEvents.CassieAnnouncing += LightflickerHandler.OnCassieAnnouncing;
             LabApi.Events.Handlers.ServerEvents.RoundEnded += LightflickerHandler.OnRoundEnded;
+            EventManager.PlayerEvents.PlayerFullConnected += RoundHandler.OnPlayerFullConnected;
         }
 
         private void UnregisterEvents()
@@ -75,13 +84,16 @@ namespace ServerToys
             events.Player.Verified -= OnVerifiedPlayer;
             events.Player.FlippingCoin -= CoinHandler.OnCoinFlipped;
             events.Server.RoundStarted -= LightflickerHandler.OnRoundStarted;
-            /*events.Map.Decontaminating -= AutoCleanerHandler.OnDecontaminatedLcz;
-            events.Warhead.Detonated -= AutoCleanerHandler.OnWarheadDetonated;*/
             events.Player.ChangingRole -= CoinHandler.OnChangingRole;
+            LabApi.Events.Handlers.PlayerEvents.Spawned -= RoundHandler.OnSpawned;
+            events.Player.RemovedHandcuffs -= CoinHandler.OnRemovedHandcuffs;
+            events.Player.Hurting -= RoundHandler.OnHurting;
+            events.Server.RoundEnded -= RoundHandler.OnRoundEnded;
+            events.Server.WaitingForPlayers -= RoundHandler.OnWaitForPlayers;
             events.Player.ReceivingEffect -= RoundHandler.OnReceivingEffect;
-            events.Player.Spawned -= RoundHandler.OnSpawned;
             LabApi.Events.Handlers.ServerEvents.CassieAnnouncing -= LightflickerHandler.OnCassieAnnouncing;
             LabApi.Events.Handlers.ServerEvents.RoundEnded -= LightflickerHandler.OnRoundEnded;
+            EventManager.PlayerEvents.PlayerFullConnected -= RoundHandler.OnPlayerFullConnected;
         }
 
         private void OnVerifiedPlayer(VerifiedEventArgs ev)
@@ -90,6 +102,8 @@ namespace ServerToys
                 return;
 
             ev.Player.ReferenceHub.gameObject.AddComponent<PlayerServerToys>();
+            
+            EventManager.PlayerEvents.InvokePlayerFullConnected(ev.Player);
         }
     }
 }

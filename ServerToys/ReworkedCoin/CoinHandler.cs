@@ -199,6 +199,12 @@ namespace ServerToys.ReworkedCoin
         
         #endregion
         
+        public void OnRemovedHandcuffs(RemovedHandcuffsEventArgs ev)
+        {
+            if (ev.Target.PlayerServerToys().CoinProps.HasHandcuffedByCoin)
+                ev.Target.PlayerServerToys().CoinProps.HasHandcuffedByCoin = false;
+        }
+        
         public void OnCoinFlipped(FlippingCoinEventArgs ev)
         {
             if (!IsEnabled)
@@ -221,7 +227,14 @@ namespace ServerToys.ReworkedCoin
         private string CallRandomEvent(Player player)
         {
             byte eventNumber = (byte)Random.Range(0, 3);
-
+            
+            bool forceRandomItemEvent = false;
+            if (eventNumber == 0 && (byte)Random.Range(0, 3) == 2)
+            {
+                eventNumber = 1;
+                forceRandomItemEvent = true;
+            }
+            
             switch (eventNumber)
             {
                 case 0: // Негативные события
@@ -235,7 +248,20 @@ namespace ServerToys.ReworkedCoin
                         {
                             player.Handcuff();
                             player.DropHeldItem();
-                            return "Ой, тебя связали... Удачи!";
+                            player.PlayerServerToys().CoinProps.HasHandcuffedByCoin = true;
+
+                            var duration = 40f;
+                            
+                            Timing.CallDelayed(duration, () =>
+                            {
+                                if (player.PlayerServerToys().CoinProps.HasHandcuffedByCoin)
+                                {
+                                    player.RemoveHandcuffs();
+                                    player.PlayerServerToys().CoinProps.HasHandcuffedByCoin = false;
+                                }
+                            });
+                            
+                            return $"Ой, тебя связали... \nРазвяжем через {(ushort)duration} секунд!";
                         }
                         case NegativeEvents.TeleportToRandomScp:
                         {
@@ -314,8 +340,8 @@ namespace ServerToys.ReworkedCoin
                             
                             player.Role.Set(RoleTypeId.Scp0492);
                             player.Teleport(oldPosition);
-                            player.MaxHealth = 800;
-                            player.Health = 800;
+                            player.MaxHealth = 1000;
+                            player.Health = 1000;
                             
                             if (scp049 != null)
                                 RueHint(scp049, $"В вашей армии пополнение!\n{player.Nickname}");
@@ -359,6 +385,9 @@ namespace ServerToys.ReworkedCoin
                 {
                     var values = (PositiveEvents[])Enum.GetValues(typeof(PositiveEvents));
                     PositiveEvents ev = values[Random.Range(0, values.Length + 1)];
+
+                    if (forceRandomItemEvent)
+                        ev = PositiveEvents.GiveRandomItem;
                     
                     switch (ev)
                     {
@@ -654,7 +683,7 @@ namespace ServerToys.ReworkedCoin
             while (player.IsAlive && player.PlayerServerToys().CoinProps.IsCoinZombie)
             {
                 player.Heal(1f);
-                yield return new WaitForSeconds(1f);
+                yield return new WaitForSeconds(0.5f);
             }
         }
         
