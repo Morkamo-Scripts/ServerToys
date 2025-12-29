@@ -190,6 +190,7 @@
         <Compile Include="ReworkedCoin\Enums\NeutralEvents.cs" />
         <Compile Include="ReworkedCoin\Enums\PositiveEvents.cs" />
         <Compile Include="RoundController\RoundHandler.cs" />
+        <Compile Include="Scp1509Capybara\Variant1509Cp.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />

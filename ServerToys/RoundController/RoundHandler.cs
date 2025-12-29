@@ -47,8 +47,6 @@ public class RoundHandler
     // Фикс зацикленного урона от поезда.
     public void OnHurting(HurtingEventArgs ev)
     {
-        Log.Info($"Protected: {ev.DamageHandler.Type}");
-        
         if (ev.DamageHandler.Type == DamageType.Crushed)
             ev.Player.IsSpawnProtected = false;
     }

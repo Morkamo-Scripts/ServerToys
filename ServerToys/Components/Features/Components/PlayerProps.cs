@@ -9,4 +9,6 @@ public class PlayerProps(PlayerServerToys playerServerToys) : IPlayerPropertyMod
     public PlayerServerToys PlayerServerToys { get; } = playerServerToys;
     
     public bool IsCrushDamageProtectectEnabled { get; set; } = false;
+    
+    public GameObject CpParent { get; set; }
 }

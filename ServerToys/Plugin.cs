@@ -2,6 +2,7 @@
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
+using Exiled.CustomItems.API;
 using Exiled.Events.EventArgs.Player;
 using HarmonyLib;
 using InventorySystem.Items.Coin;
@@ -24,7 +25,7 @@ namespace ServerToys
         public override string Prefix => Name;
         public override string Author => "Morkamo";
         public override Version RequiredExiledVersion => new(9, 1, 0);
-        public override Version Version => new(2, 1, 0);
+        public override Version Version => new(2, 2, 0);
 
         public static Plugin Instance;
         public static Harmony Harmony;
@@ -42,8 +43,9 @@ namespace ServerToys
             
             CoinHandler = Config.Handler;
             LightflickerHandler = new LightflickerHandler();
-            /*AutoCleanerHandler = new AutoCleanerHandler();*/
             RoundHandler =  new RoundHandler();
+            
+            Config.Scp1509Capybara.Register();
             
             RegisterEvents();
             base.OnEnabled();
@@ -56,6 +58,8 @@ namespace ServerToys
             RoundHandler = null;
             LightflickerHandler = null;
             CoinHandler = null;
+            
+            Config.Scp1509Capybara.Unregister();
             
             Harmony.UnpatchAll();
             Instance = null;
