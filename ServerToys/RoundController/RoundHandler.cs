@@ -1,12 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using Exiled.API.Enums;
 using Exiled.API.Extensions;
 using Exiled.API.Features;
+using Exiled.API.Features.Roles;
 using Exiled.Events.EventArgs.Player;
+using Exiled.Events.EventArgs.Scp079;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.ServerEvents;
 using MEC;
 using PlayerRoles;
+using PlayerRoles.PlayableScps.Scp079;
 using ServerToys.Components.Events.EventArgs.Player;
 using ServerToys.Components.Extensions;
 using RoundEndedEventArgs = Exiled.Events.EventArgs.Server.RoundEndedEventArgs;
@@ -26,10 +31,13 @@ public class RoundHandler
     
     public void OnSpawned(PlayerSpawnedEventArgs ev)
     {
-        if (ev.Player.Role == RoleTypeId.Flamingo || ev.Player.Role == RoleTypeId.ZombieFlamingo)
+        if (Plugin.Instance.Config.ServerIdentifier == "Modded")
         {
-            ev.Player.Health = 150;
-            ev.Player.MaxHealth = 150;
+            if (ev.Player.Role == RoleTypeId.Flamingo || ev.Player.Role == RoleTypeId.ZombieFlamingo)
+            {
+                ev.Player.Health = 200;
+                ev.Player.MaxHealth = 200;
+            }
         }
         
         _earlySpawnedPlayer.Add(ev.Player.UserId);
@@ -47,6 +55,12 @@ public class RoundHandler
     // Фикс зацикленного урона от поезда.
     public void OnHurting(HurtingEventArgs ev)
     {
+        if (Plugin.Instance.Config.ServerIdentifier == "Modded")
+        {
+            if (ev.Attacker?.Role == RoleTypeId.Scp096)
+                ev.Amount = 10000;
+        }
+        
         if (ev.DamageHandler.Type == DamageType.Crushed)
             ev.Player.IsSpawnProtected = false;
     }
@@ -64,6 +78,7 @@ public class RoundHandler
 
     public void OnWaitForPlayers()
     {
+        Timing.CallDelayed(5f, () => Server.ExecuteCommand("/mp l main"));
         _earlySpawnedPlayer.Clear();
     }
     

@@ -107,7 +107,7 @@ public class Variant1509Cp : CustomItem
         
     private void OnDied(DiedEventArgs ev)
     {
-        if (ev.Attacker.CurrentItem != null && Check(ev.Attacker?.CurrentItem))
+        if (ev.Attacker?.CurrentItem != null && Check(ev.Attacker?.CurrentItem))
         {
             var center = ev.Ragdoll.Position + Vector3.up * 0.3f;
             var radius = 1.2f;

@@ -9,9 +9,13 @@ namespace ServerToys
         public bool IsEnabled { get; set; } = true;
         public bool Debug { get; set; } = false;
         
-        public CoinHandler Handler { get; set; } = new CoinHandler();
+        public string ServerIdentifier { get; set; } = "Classic";
+        
+        /*public CoinHandler Handler { get; set; } = new CoinHandler();*/
         public bool IsLightflickerEnabled { get; set; } = true;
         
         public Variant1509Cp Scp1509Capybara { get; set; } = new Variant1509Cp();
+
+        public float LostSignalScp079Time { get; set; } = 30f;
     }
 }

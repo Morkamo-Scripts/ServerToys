@@ -21,8 +21,11 @@ public class LightflickerHandler
 
     public void OnRoundStarted()
     {
-        if (Plugin.Instance.Config.IsLightflickerEnabled)
-            Timing.RunCoroutine(FlickerHandler(), "CassieLightFlicker");
+        if (Plugin.Instance.Config.ServerIdentifier == "Modded")
+        {
+            if (Plugin.Instance.Config.IsLightflickerEnabled)
+                Timing.RunCoroutine(FlickerHandler(), "CassieLightFlicker");
+        }
     }
 
     public void OnRoundEnded(RoundEndedEventArgs ev)

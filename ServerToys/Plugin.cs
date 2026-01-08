@@ -15,6 +15,7 @@ using ServerToys.Components.Features;
 using ServerToys.Lightflicker;
 using ServerToys.ReworkedCoin;
 using ServerToys.RoundController;
+using ServerToys.Scp2356Upgraded;
 using events = Exiled.Events.Handlers;
 
 namespace ServerToys
@@ -25,14 +26,13 @@ namespace ServerToys
         public override string Prefix => Name;
         public override string Author => "Morkamo";
         public override Version RequiredExiledVersion => new(9, 1, 0);
-        public override Version Version => new(2, 2, 0);
+        public override Version Version => new(2, 3, 0);
 
         public static Plugin Instance;
         public static Harmony Harmony;
-        public CoinHandler CoinHandler;
         public LightflickerHandler LightflickerHandler;
-        /*public AutoCleanerHandler AutoCleanerHandler;*/
         public RoundHandler RoundHandler;
+        public Scp2356UpgradeHandler Scp2356UpgradeHandler;
 
         public override void OnEnabled()
         {
@@ -41,9 +41,9 @@ namespace ServerToys
             Harmony = new Harmony("ru.morkamo.serverToys.patches");
             Harmony.PatchAll();
             
-            CoinHandler = Config.Handler;
             LightflickerHandler = new LightflickerHandler();
             RoundHandler =  new RoundHandler();
+            Scp2356UpgradeHandler = new Scp2356UpgradeHandler();
             
             Config.Scp1509Capybara.Register();
             
@@ -51,13 +51,13 @@ namespace ServerToys
             base.OnEnabled();
         }
 
-        public override void OnDisabled()
+        public override void OnDisabled() 
         {
             UnregisterEvents();
 
             RoundHandler = null;
             LightflickerHandler = null;
-            CoinHandler = null;
+            Scp2356UpgradeHandler = null;
             
             Config.Scp1509Capybara.Unregister();
             
@@ -69,15 +69,16 @@ namespace ServerToys
         private void RegisterEvents()
         {
             events.Player.Verified += OnVerifiedPlayer;
-            events.Player.FlippingCoin += CoinHandler.OnCoinFlipped;
+            /*events.Player.FlippingCoin += CoinHandler.OnCoinFlipped;*/
             events.Server.RoundStarted += LightflickerHandler.OnRoundStarted;
-            events.Player.ChangingRole += CoinHandler.OnChangingRole;
+            /*events.Player.ChangingRole += CoinHandler.OnChangingRole;*/
             LabApi.Events.Handlers.PlayerEvents.Spawned += RoundHandler.OnSpawned;
-            events.Player.RemovedHandcuffs += CoinHandler.OnRemovedHandcuffs;
+            /*events.Player.RemovedHandcuffs += CoinHandler.OnRemovedHandcuffs;*/
             events.Player.Hurting += RoundHandler.OnHurting;
             events.Server.RoundEnded += RoundHandler.OnRoundEnded;
             events.Server.WaitingForPlayers += RoundHandler.OnWaitForPlayers;
             events.Player.ReceivingEffect += RoundHandler.OnReceivingEffect;
+            events.Scp2536.GrantingGift += Scp2356UpgradeHandler.OnGrantingGift;
             LabApi.Events.Handlers.ServerEvents.CassieAnnouncing += LightflickerHandler.OnCassieAnnouncing;
             LabApi.Events.Handlers.ServerEvents.RoundEnded += LightflickerHandler.OnRoundEnded;
             EventManager.PlayerEvents.PlayerFullConnected += RoundHandler.OnPlayerFullConnected;
@@ -86,15 +87,16 @@ namespace ServerToys
         private void UnregisterEvents()
         {
             events.Player.Verified -= OnVerifiedPlayer;
-            events.Player.FlippingCoin -= CoinHandler.OnCoinFlipped;
+            /*events.Player.FlippingCoin -= CoinHandler.OnCoinFlipped;*/
             events.Server.RoundStarted -= LightflickerHandler.OnRoundStarted;
-            events.Player.ChangingRole -= CoinHandler.OnChangingRole;
+            /*events.Player.ChangingRole -= CoinHandler.OnChangingRole;*/
             LabApi.Events.Handlers.PlayerEvents.Spawned -= RoundHandler.OnSpawned;
-            events.Player.RemovedHandcuffs -= CoinHandler.OnRemovedHandcuffs;
+            /*events.Player.RemovedHandcuffs -= CoinHandler.OnRemovedHandcuffs;*/
             events.Player.Hurting -= RoundHandler.OnHurting;
             events.Server.RoundEnded -= RoundHandler.OnRoundEnded;
             events.Server.WaitingForPlayers -= RoundHandler.OnWaitForPlayers;
             events.Player.ReceivingEffect -= RoundHandler.OnReceivingEffect;
+            events.Scp2536.GrantingGift -= Scp2356UpgradeHandler.OnGrantingGift;
             LabApi.Events.Handlers.ServerEvents.CassieAnnouncing -= LightflickerHandler.OnCassieAnnouncing;
             LabApi.Events.Handlers.ServerEvents.RoundEnded -= LightflickerHandler.OnRoundEnded;
             EventManager.PlayerEvents.PlayerFullConnected -= RoundHandler.OnPlayerFullConnected;
