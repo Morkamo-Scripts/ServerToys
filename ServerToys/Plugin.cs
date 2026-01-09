@@ -6,6 +6,7 @@ using Exiled.CustomItems.API;
 using Exiled.Events.EventArgs.Player;
 using HarmonyLib;
 using InventorySystem.Items.Coin;
+using InventorySystem.Items.Scp1509;
 using MEC;
 using Mirror;
 using PlayerRoles;
@@ -15,6 +16,7 @@ using ServerToys.Components.Features;
 using ServerToys.Lightflicker;
 using ServerToys.ReworkedCoin;
 using ServerToys.RoundController;
+using ServerToys.Scp1509InventoryReset;
 using ServerToys.Scp2356Upgraded;
 using events = Exiled.Events.Handlers;
 
@@ -26,13 +28,14 @@ namespace ServerToys
         public override string Prefix => Name;
         public override string Author => "Morkamo";
         public override Version RequiredExiledVersion => new(9, 1, 0);
-        public override Version Version => new(2, 3, 0);
+        public override Version Version => new(2, 5, 0);
 
         public static Plugin Instance;
         public static Harmony Harmony;
         public LightflickerHandler LightflickerHandler;
         public RoundHandler RoundHandler;
         public Scp2356UpgradeHandler Scp2356UpgradeHandler;
+        public Scp1509InventoryHandler Scp1509InventoryHandler;
 
         public override void OnEnabled()
         {
@@ -44,6 +47,7 @@ namespace ServerToys
             LightflickerHandler = new LightflickerHandler();
             RoundHandler =  new RoundHandler();
             Scp2356UpgradeHandler = new Scp2356UpgradeHandler();
+            Scp1509InventoryHandler = new Scp1509InventoryHandler();
             
             Config.Scp1509Capybara.Register();
             
@@ -58,6 +62,7 @@ namespace ServerToys
             RoundHandler = null;
             LightflickerHandler = null;
             Scp2356UpgradeHandler = null;
+            Scp1509InventoryHandler = null;
             
             Config.Scp1509Capybara.Unregister();
             
@@ -79,6 +84,7 @@ namespace ServerToys
             events.Server.WaitingForPlayers += RoundHandler.OnWaitForPlayers;
             events.Player.ReceivingEffect += RoundHandler.OnReceivingEffect;
             events.Scp2536.GrantingGift += Scp2356UpgradeHandler.OnGrantingGift;
+            events.Player.Spawned += Scp1509InventoryHandler.OnPlayerResurrected;
             LabApi.Events.Handlers.ServerEvents.CassieAnnouncing += LightflickerHandler.OnCassieAnnouncing;
             LabApi.Events.Handlers.ServerEvents.RoundEnded += LightflickerHandler.OnRoundEnded;
             EventManager.PlayerEvents.PlayerFullConnected += RoundHandler.OnPlayerFullConnected;
@@ -97,6 +103,7 @@ namespace ServerToys
             events.Server.WaitingForPlayers -= RoundHandler.OnWaitForPlayers;
             events.Player.ReceivingEffect -= RoundHandler.OnReceivingEffect;
             events.Scp2536.GrantingGift -= Scp2356UpgradeHandler.OnGrantingGift;
+            events.Player.Spawned -= Scp1509InventoryHandler.OnPlayerResurrected;
             LabApi.Events.Handlers.ServerEvents.CassieAnnouncing -= LightflickerHandler.OnCassieAnnouncing;
             LabApi.Events.Handlers.ServerEvents.RoundEnded -= LightflickerHandler.OnRoundEnded;
             EventManager.PlayerEvents.PlayerFullConnected -= RoundHandler.OnPlayerFullConnected;

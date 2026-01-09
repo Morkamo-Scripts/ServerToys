@@ -197,6 +197,7 @@
         <Compile Include="ReworkedCoin\Enums\PositiveEvents.cs" />
         <Compile Include="RoundController\RoundHandler.cs" />
         <Compile Include="Scp1509Capybara\Variant1509Cp.cs" />
+        <Compile Include="Scp1509InventoryReset\Scp1509InventoryHandler.cs" />
         <Compile Include="Scp2356Upgraded\Scp2356UpgradeHandler.cs" />
     </ItemGroup>
     <ItemGroup>

@@ -15,7 +15,7 @@ namespace ServerToys.Scp2356Upgraded;
 public class Scp2356UpgradeHandler
 {
     private static List<SchematicObject> SpawnedMelons { get; set; } = new();
-    private static List<SchematicObject> SpawnedMiyabies { get; set; } = new();
+    /*private static List<SchematicObject> SpawnedMiyabies { get; set; } = new();*/
     
     private const int MaxMiyabi = 5;
     private const int MaxMelon = 10;
@@ -26,12 +26,12 @@ public class Scp2356UpgradeHandler
         var spawnPos = ev.Player.Transform.position + ev.Player.Transform.forward * forwardOffset;
         SchematicObject toy;
 
-        if (Random.Range(1, 101) <= 30)
+        if (ev.Player.Zone != ZoneType.Surface && Random.Range(1, 101) <= 20)
         {
             if (!ProjectMER.Features.MapUtils.TryGetSchematicDataByName("MiyabiToy", out _))
                 return;
 
-            if (SpawnedMiyabies.Count >= MaxMiyabi)
+            /*if (SpawnedMiyabies.Count >= MaxMiyabi)
             {
                 var oldest = SpawnedMiyabies[0];
                 SpawnedMiyabies.RemoveAt(0);
@@ -39,12 +39,12 @@ public class Scp2356UpgradeHandler
                 if (oldest != null)
                 {
                     try { oldest.Destroy(); }
-                    catch { /* ignored */ }
+                    catch { /* ignored #1# }
                 }
-            }
+            }*/
 
             toy = ProjectMER.Features.ObjectSpawner.SpawnSchematic("MiyabiToy", spawnPos);
-            SpawnedMiyabies.Add(toy);
+            Timing.CallDelayed(120f, () => toy.Destroy());
         }
         else if (Random.Range(1, 101) <= 30)
         {
